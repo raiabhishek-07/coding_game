@@ -11,6 +11,7 @@ import ConsolePanel from '@/components/ConsolePanel/ConsolePanel';
 import ByteCompanion from '@/components/Companion/ByteCompanion';
 import LevelCompleteModal from '@/components/LevelComplete/LevelCompleteModal';
 import StreakCelebration from '@/components/StreakCelebration/StreakCelebration';
+import AIChat from '@/components/AIChat/AIChat';
 
 const WORLD_THEMES: Record<string, { bg: string; accent: string; icon: string }> = {
     forest: { bg: 'linear-gradient(135deg, #0d1f0d, #1a3a1a)', accent: '#00d4aa', icon: '🌲' },
@@ -168,6 +169,13 @@ export default function GamePage() {
                     <ConsolePanel />
                 </div>
             </div>
+
+            {/* AI Chat Companion Overlay */}
+            <AIChat
+                levelId={level.id}
+                levelTitle={level.title}
+                levelDescription={level.objective}
+            />
         </div>
     );
 }
