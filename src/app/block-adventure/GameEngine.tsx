@@ -29,6 +29,10 @@ class MainScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 48
         });
+        this.load.spritesheet('tiny_town', '/assets/tiny_town_tiles.png', {
+            frameWidth: 16,
+            frameHeight: 16
+        });
         this.load.image('gem', '/assets/gem.png');
         this.load.image('beach_bg', '/assets/scenery/beach_bg.png');
         this.load.image('forest_bg', '/assets/scenery/forest_bg.png');
@@ -56,7 +60,7 @@ class MainScene extends Phaser.Scene {
         };
 
         const config = themeConfig[theme] || themeConfig.beach;
-        this.cameras.main.setBackgroundColor(config.bg);
+        this.cameras.main.setBackgroundColor('rgba(0,0,0,0)');
 
         // 1. ADVANCED BACKGROUND SYSTEM (Triple Parallax)
         const bgFar = this.add.tileSprite(0, 0, width * GRID_SIZE, height * GRID_SIZE, config.bgKey).setOrigin(0).setDepth(-30).setAlpha(0.2).setScrollFactor(0.1);
@@ -66,16 +70,52 @@ class MainScene extends Phaser.Scene {
         this.tweens.add({ targets: [bgFar, bgMid, bgNear], tilePositionX: 1000, tilePositionY: 500, duration: 60000, repeat: -1 });
 
         // 2. TERRAIN SYSTEM
+        const islandWidth = width * GRID_SIZE - (2 * GRID_SIZE);
+        const islandHeight = height * GRID_SIZE - (2 * GRID_SIZE);
+        const islandX = GRID_SIZE;
+        const islandY = GRID_SIZE;
+
+        // Shadow under the island
+        const dropShadow = this.add.graphics().setDepth(-12);
+        dropShadow.fillStyle(0x000000, 0.4);
+        dropShadow.fillRoundedRect(islandX - 10, islandY + 15, islandWidth + 20, islandHeight + 20, 36);
+
+        // Island 3D Base (Deep cliff)
+        const landBase = this.add.graphics({ x: 0, y: 0 }).setDepth(-11);
+        landBase.fillStyle(Phaser.Display.Color.IntegerToColor(config.land).darken(40).color, 1);
+        landBase.fillRoundedRect(islandX, islandY + 30, islandWidth, islandHeight, 32);
+
         const land = this.add.graphics({ x: 0, y: 0 }).setDepth(-10);
-        land.fillStyle(config.land, 0.9);
-        land.fillRoundedRect(GRID_SIZE, GRID_SIZE, width * GRID_SIZE - (2 * GRID_SIZE), height * GRID_SIZE - (2 * GRID_SIZE), 32);
+        land.fillStyle(config.land, 1);
+        land.fillRoundedRect(islandX, islandY, islandWidth, islandHeight, 32);
+
+        // Pixel Art Ground Overlay! 
+        for (let ix = 1; ix < width - 1; ix++) {
+            for (let iy = 1; iy < height - 1; iy++) {
+                // Mostly solid grass with rare variations to keep it clean
+                const frameVars = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2];
+                const f = frameVars[Phaser.Math.Between(0, frameVars.length - 1)];
+                this.add.image(ix * GRID_SIZE + GRID_SIZE / 2, iy * GRID_SIZE + GRID_SIZE / 2, 'tiny_town', f).setDepth(-9).setScale(4);
+            }
+        }
+
+        // Inner rim light
+        land.lineStyle(4, 0xffffff, 0.3);
+        land.strokeRoundedRect(islandX + 2, islandY + 2, islandWidth - 4, islandHeight - 4, 30);
 
         // Subtle Grid
         const grid = this.add.graphics({ x: 0, y: 0 }).setDepth(-5);
-        grid.lineStyle(1, 0xffffff, 0.05);
-        for (let i = 1; i < width; i++) { grid.moveTo(i * GRID_SIZE, GRID_SIZE); grid.lineTo(i * GRID_SIZE, (height - 1) * GRID_SIZE); }
-        for (let j = 1; j < height; j++) { grid.moveTo(GRID_SIZE, j * GRID_SIZE); grid.lineTo((width - 1) * GRID_SIZE, j * GRID_SIZE); }
+        grid.lineStyle(2, 0xffffff, 0.15);
+        for (let i = 1; i <= width - 1; i++) { grid.moveTo(i * GRID_SIZE, GRID_SIZE); grid.lineTo(i * GRID_SIZE, (height - 1) * GRID_SIZE); }
+        for (let j = 1; j <= height - 1; j++) { grid.moveTo(GRID_SIZE, j * GRID_SIZE); grid.lineTo((width - 1) * GRID_SIZE, j * GRID_SIZE); }
         grid.strokePath();
+
+        grid.fillStyle(0xffffff, 0.2);
+        for (let i = 1; i < width; i++) {
+            for (let j = 1; j < height; j++) {
+                grid.fillCircle(i * GRID_SIZE, j * GRID_SIZE, 3);
+            }
+        }
 
         // 3. WATER SHORELINE SYSTEM
         const waterTex = this.add.tileSprite(0, 0, width * GRID_SIZE, height * GRID_SIZE, config.bgKey).setOrigin(0).setDepth(-15).setAlpha(0.3).setTint(config.water);
@@ -151,54 +191,52 @@ class MainScene extends Phaser.Scene {
     }
 
     addScenery(props: string[], width: number, height: number, start: any) {
-        const count = Math.floor((width * height) / 3);
+        const count = Math.floor((width * height) / 4);
         const margin = GRID_SIZE;
 
         for (let i = 0; i < count; i++) {
             const rx = Phaser.Math.Between(margin, (width - 1) * GRID_SIZE);
             const ry = Phaser.Math.Between(margin, (height - 1) * GRID_SIZE);
 
-            // Avoid spawning on player start or paths roughly
+            // Avoid spawning on player start roughly
             if (Math.abs(rx - (start.x * GRID_SIZE)) < 80 && Math.abs(ry - (start.y * GRID_SIZE)) < 80) continue;
 
-            const emoji = props[Phaser.Math.Between(0, props.length - 1)];
-            const size = Phaser.Math.Between(24, 48);
-            const text = this.add.text(rx, ry, emoji, { fontSize: `${size}px` }).setOrigin(0.5).setAlpha(0.85).setDepth(2);
+            const scx = rx;
+            const scy = ry;
 
-            // WIND SWAY LOGIC
-            const sway = Phaser.Math.Between(5, 12);
+            const isPlant = Phaser.Math.Between(0, 1) === 0;
+            const size = 16;
+
+            // Drop shadow
+            this.add.ellipse(scx, scy + 20, size * 2, size, 0x000000, 0.2).setDepth(1);
+
+            // Use actual tree/nature tiles (Tile 31 is a green pine tree, Tile 43 is a bush)
+            const frameId = isPlant ? 31 : 43;
+            const tileSpr = this.add.image(scx, scy, 'tiny_town', frameId).setDepth(2).setScale(3 + Math.random());
+
             this.tweens.add({
-                targets: text,
-                angle: { from: -sway, to: sway },
-                y: ry - 5,
-                duration: 2000 + Phaser.Math.Between(0, 2000),
+                targets: tileSpr,
+                y: '-=6',
+                duration: 1500 + Phaser.Math.Between(0, 1000),
                 yoyo: true,
                 repeat: -1,
                 ease: 'Sine.inOut'
             });
-
-            // Shadow
-            const shadow = this.add.circle(rx, ry + 15, size / 3, 0x000000, 0.2).setDepth(1);
-            this.tweens.add({ targets: shadow, scaleX: 1.2, duration: 2000, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
         }
     }
 
     createObstacle(obs: any, landColor: number, isAbyss: boolean) {
         const cx = obs.x * GRID_SIZE + GRID_SIZE / 2;
         const cy = obs.y * GRID_SIZE + GRID_SIZE / 2;
-        const rock = this.add.graphics().setDepth(5);
 
-        const baseColor = isAbyss ? 0x2e004d : landColor - 0x222222;
-        rock.fillStyle(baseColor, 1);
-        rock.fillRoundedRect(cx - 25, cy - 25, 50, 50, 10);
+        // Shadow
+        this.add.graphics({ x: 0, y: 0 })
+            .setDepth(4)
+            .fillStyle(0x000000, 0.3)
+            .fillRoundedRect(cx - 20, cy - 20, 44, 44, 8);
 
-        if (isAbyss) {
-            rock.lineStyle(2, 0x9b59b6, 0.5);
-            rock.strokeRoundedRect(cx - 25, cy - 25, 50, 50, 10);
-        } else {
-            rock.fillStyle(landColor + 0x111111, 0.3);
-            rock.fillCircle(cx - 10, cy - 10, 15);
-        }
+        // Use a grey stone wall tile for obstacles! (Tiles 48, 49, 50)
+        this.add.image(cx, cy - 5, 'tiny_town', Phaser.Math.Between(48, 50)).setDepth(5).setScale(4);
     }
 
     createGem(gem: any) {
@@ -216,26 +254,37 @@ class MainScene extends Phaser.Scene {
         const cy = enemy.y * GRID_SIZE + GRID_SIZE / 2;
         const container = this.add.container(cx, cy).setDepth(15);
 
-        let visual = '🤖';
-        if (enemy.type === 'guardian') visual = '🦀';
-        else if (enemy.type === 'golem') visual = '🦍';
-        else if (enemy.type === 'dragon') visual = '🐲';
+        // Shadow
+        const shadow = this.add.ellipse(0, 18, 30, 15, 0x000000, 0.4);
+        container.add(shadow);
 
-        const text = this.add.text(0, 0, visual, { fontSize: enemy.isBoss ? '48px' : '32px' }).setOrigin(0.5);
-        container.add(text);
+        // Use the hero sprite tinted red for a super game-like feel
+        const sprite = this.add.sprite(0, 0, 'hero').setOrigin(0.5);
+        sprite.setTint(0xff3333);
+        sprite.setFrame(4); // Idle face frame
 
-        // Breathing animation
+        if (enemy.isBoss) {
+            sprite.setScale(1.6);
+            sprite.setTint(0xff0000); // deeper red
+        } else {
+            sprite.setScale(1.2);
+        }
+
+        container.add(sprite);
+
+        // Breathing/Hover animation
         this.tweens.add({
-            targets: text,
-            scale: 1.1,
-            duration: 1000,
+            targets: sprite,
+            y: '-=8',
+            duration: 800 + Phaser.Math.Between(0, 400),
             yoyo: true,
-            repeat: -1
+            repeat: -1,
+            ease: 'Sine.inOut'
         });
 
         // Health Bar
-        const hbBg = this.add.rectangle(0, -25, 40, 5, 0x000000).setOrigin(0.5);
-        const hbFg = this.add.rectangle(0, -25, 40, 5, 0xff0000).setOrigin(0.5);
+        const hbBg = this.add.rectangle(0, -35, 40, 5, 0x000000).setOrigin(0.5);
+        const hbFg = this.add.rectangle(0, -35, 40, 5, 0xff0000).setOrigin(0.5);
         container.add([hbBg, hbFg]);
         container.setData('hbFg', hbFg);
         container.setData('maxHealth', enemy.health);
@@ -569,7 +618,8 @@ export default function GameEngine({ blocks, level, runTrigger, stopTrigger, onF
             parent: container,
             scene: MainScene,
             pixelArt: true,
-            backgroundColor: '#000000',
+            backgroundColor: 'transparent',
+            transparent: true,
             antialias: false,
             scale: {
                 mode: Phaser.Scale.FIT,
@@ -621,8 +671,7 @@ export default function GameEngine({ blocks, level, runTrigger, stopTrigger, onF
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            overflow: 'hidden',
-            borderRadius: '24px'
+            overflow: 'hidden'
         }} />
     );
 }

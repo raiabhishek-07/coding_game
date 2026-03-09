@@ -40,11 +40,11 @@ export interface BlockInstance {
 
 // Block Category Definitions
 export const BLOCK_CATEGORIES: Record<BlockCategory, { label: string; color: string; icon: string }> = {
-  movement: { label: 'Movement', color: '#3498db', icon: '🎯' },
-  control: { label: 'Control', color: '#f39c12', icon: '🔄' },
-  logic: { label: 'Logic', color: '#9b59b6', icon: '🧠' },
-  algorithm: { label: 'Algorithms', color: '#e74c3c', icon: '⚡' },
-  action: { label: 'Actions', color: '#2ecc71', icon: '⭐' }
+  movement: { label: 'Movement', color: '#38bdf8', icon: '🚀' },
+  action: { label: 'Actions', color: '#fbbf24', icon: '⚡' },
+  control: { label: 'Control', color: '#f472b6', icon: '🔄' },
+  logic: { label: 'Logic', color: '#a78bfa', icon: '🧠' },
+  algorithm: { label: 'Algorithms', color: '#4ade80', icon: '🧬' }
 };
 
 // All Available Blocks
@@ -53,296 +53,137 @@ export const BLOCK_LIBRARY: Record<string, BlockDefinition> = {
   moveUp: {
     id: 'moveUp',
     category: 'movement',
-    label: 'Move Up',
+    label: 'Forward Advance',
     icon: '⬆️',
-    color: '#3498db',
-    borderColor: '#2980b9',
+    color: '#0ea5e9',
+    borderColor: '#0284c7',
     connectable: 'both',
     canNest: true,
-    description: 'Move the character up one cell'
+    description: 'Advance forward in the current vector'
   },
   moveDown: {
     id: 'moveDown',
     category: 'movement',
-    label: 'Move Down',
+    label: 'Reverse Thrust',
     icon: '⬇️',
-    color: '#3498db',
-    borderColor: '#2980b9',
+    color: '#0ea5e9',
+    borderColor: '#0284c7',
     connectable: 'both',
     canNest: true,
-    description: 'Move the character down one cell'
+    description: 'Reverse movement along current axis'
   },
   moveLeft: {
     id: 'moveLeft',
     category: 'movement',
-    label: 'Move Left',
+    label: 'Port Pivot',
     icon: '⬅️',
-    color: '#3498db',
-    borderColor: '#2980b9',
+    color: '#0ea5e9',
+    borderColor: '#0284c7',
     connectable: 'both',
     canNest: true,
-    description: 'Move the character left one cell'
+    description: 'Lateral shift to port side'
   },
   moveRight: {
     id: 'moveRight',
     category: 'movement',
-    label: 'Move Right',
+    label: 'Starboard Pivot',
     icon: '➡️',
-    color: '#3498db',
-    borderColor: '#2980b9',
+    color: '#0ea5e9',
+    borderColor: '#0284c7',
     connectable: 'both',
     canNest: true,
-    description: 'Move the character right one cell'
+    description: 'Lateral shift to starboard side'
   },
 
   // Control Blocks
   repeat: {
     id: 'repeat',
     category: 'control',
-    label: 'Repeat',
+    label: 'Iteration Loop',
     icon: '🔄',
-    color: '#f39c12',
-    borderColor: '#d68910',
+    color: '#ec4899',
+    borderColor: '#db2777',
     params: [{ name: 'times', type: 'number', default: 2, options: undefined }],
     connectable: 'both',
     canNest: true,
-    description: 'Repeat the blocks inside N times'
-  },
-  repeatForever: {
-    id: 'repeatForever',
-    category: 'control',
-    label: 'Repeat Forever',
-    icon: '♾️',
-    color: '#f39c12',
-    borderColor: '#d68910',
-    connectable: 'top',
-    canNest: true,
-    description: 'Repeat blocks continuously'
+    description: 'Execute nested modules repeatedly'
   },
   wait: {
     id: 'wait',
     category: 'control',
-    label: 'Wait',
+    label: 'Temporal Buffer',
     icon: '⏱️',
-    color: '#f39c12',
-    borderColor: '#d68910',
-    params: [{ name: 'seconds', type: 'number', default: 1 }],
+    color: '#f43f5e',
+    borderColor: '#e11d48',
+    params: [{ name: 'ms', type: 'number', default: 1000 }],
     connectable: 'both',
     canNest: true,
-    description: 'Wait for N seconds'
+    description: 'Pause execution for duration'
   },
 
   // Logic Blocks
   ifThen: {
     id: 'ifThen',
     category: 'logic',
-    label: 'If Then',
+    label: 'Conditional Branch',
     icon: '❓',
-    color: '#9b59b6',
-    borderColor: '#8e44ad',
+    color: '#8b5cf6',
+    borderColor: '#7c3aed',
     params: [
       {
-        name: 'condition', type: 'select', default: 'gemAhead', options: [
-          { label: 'Gem Ahead', value: 'gemAhead' },
-          { label: 'Wall Ahead', value: 'wallAhead' },
-          { label: 'Can Move', value: 'canMove' },
-          { label: 'Enemy Ahead', value: 'enemyAhead' }
+        name: 'sensor', type: 'select', default: 'gemAhead', options: [
+          { label: 'Gem Detected', value: 'gemAhead' },
+          { label: 'Obstacle Detected', value: 'wallAhead' },
+          { label: 'Clear Path', value: 'canMove' }
         ]
       }
     ],
     connectable: 'both',
     canNest: true,
-    description: 'Execute blocks if condition is true'
-  },
-  ifThenElse: {
-    id: 'ifThenElse',
-    category: 'logic',
-    label: 'If Then Else',
-    icon: '❓❗',
-    color: '#9b59b6',
-    borderColor: '#8e44ad',
-    params: [
-      {
-        name: 'condition', type: 'select', default: 'gemAhead', options: [
-          { label: 'Gem Ahead', value: 'gemAhead' },
-          { label: 'Wall Ahead', value: 'wallAhead' },
-          { label: 'Can Move', value: 'canMove' },
-          { label: 'Enemy Ahead', value: 'enemyAhead' }
-        ]
-      }
-    ],
-    connectable: 'both',
-    canNest: true,
-    description: 'Execute one block or another based on condition'
-  },
-  defineFunction: {
-    id: 'defineFunction',
-    category: 'logic',
-    label: 'Define Function',
-    icon: '📦',
-    color: '#8e44ad',
-    borderColor: '#7d3c98',
-    params: [{ name: 'name', type: 'string', default: 'myFunction' }],
-    connectable: 'none',
-    canNest: true,
-    description: 'Define a reusable block of code'
-  },
-  callFunction: {
-    id: 'callFunction',
-    category: 'logic',
-    label: 'Call Function',
-    icon: '📞',
-    color: '#8e44ad',
-    borderColor: '#7d3c98',
-    params: [{ name: 'name', type: 'string', default: 'myFunction' }],
-    connectable: 'both',
-    canNest: false,
-    description: 'Execute a defined function'
+    description: 'Branch execution based on sensor telemetry'
   },
 
   // Algorithm Blocks
   runBFS: {
     id: 'runBFS',
     category: 'algorithm',
-    label: 'Run BFS',
-    icon: '🔵',
-    color: '#e74c3c',
-    borderColor: '#c0392b',
+    label: 'Breadth Search',
+    icon: '📡',
+    color: '#10b981',
+    borderColor: '#059669',
     params: [
       {
         name: 'target', type: 'select', default: 'nearestGem', options: [
-          { label: 'Nearest Gem', value: 'nearestGem' },
-          { label: 'All Gems', value: 'allGems' }
+          { label: 'Nearest Artifact', value: 'nearestGem' }
         ]
       }
     ],
     connectable: 'both',
     canNest: false,
-    description: 'Run BFS algorithm to find shortest path'
-  },
-  runDFS: {
-    id: 'runDFS',
-    category: 'algorithm',
-    label: 'Run DFS',
-    icon: '🟠',
-    color: '#e74c3c',
-    borderColor: '#c0392b',
-    params: [
-      {
-        name: 'target', type: 'select', default: 'nearestGem', options: [
-          { label: 'Nearest Gem', value: 'nearestGem' },
-          { label: 'All Gems', value: 'allGems' }
-        ]
-      }
-    ],
-    connectable: 'both',
-    canNest: false,
-    description: 'Run DFS algorithm to explore path'
-  },
-  runAStar: {
-    id: 'runAStar',
-    category: 'algorithm',
-    label: 'Run A*',
-    icon: '⭐',
-    color: '#e74c3c',
-    borderColor: '#c0392b',
-    params: [
-      {
-        name: 'target', type: 'select', default: 'nearestGem', options: [
-          { label: 'Nearest Gem', value: 'nearestGem' },
-          { label: 'All Gems', value: 'allGems' }
-        ]
-      }
-    ],
-    connectable: 'both',
-    canNest: false,
-    description: 'Run A* pathfinding algorithm'
+    description: 'Execute optimal breadth-first discovery'
   },
 
   // Action Blocks
-  attack: {
-    id: 'attack',
+  collectManual: {
+    id: 'collectManual',
     category: 'action',
-    label: 'Attack',
-    icon: '⚔️',
-    color: '#e74c3c',
-    borderColor: '#c0392b',
+    label: 'Acquire Artifact',
+    icon: '💎',
+    color: '#f59e0b',
+    borderColor: '#d97706',
     connectable: 'both',
     canNest: false,
-    description: 'Attack adjacent enemies'
+    description: 'Initiate collection sequence'
   },
   scan: {
     id: 'scan',
     category: 'action',
-    label: 'Scan',
+    label: 'Terrain Scan',
     icon: '🔍',
-    color: '#3498db',
-    borderColor: '#2980b9',
+    color: '#06b6d4',
+    borderColor: '#0891b2',
     connectable: 'both',
     canNest: false,
-    description: 'Scan surroundings for gems and enemies'
-  },
-  collectManual: {
-    id: 'collectManual',
-    category: 'action',
-    label: 'Collect',
-    icon: '💎',
-    color: '#f1c40f',
-    borderColor: '#f39c12',
-    connectable: 'both',
-    canNest: false,
-    description: 'Manually collect a gem on the current tile'
-  },
-  changeCharacter: {
-    id: 'changeCharacter',
-    category: 'action',
-    label: 'Change Character',
-    icon: '🐕',
-    color: '#2ecc71',
-    borderColor: '#27ae60',
-    params: [
-      {
-        name: 'character', type: 'select', default: 'dog', options: [
-          { label: 'Dog', value: 'dog' },
-          { label: 'Cat', value: 'cat' },
-          { label: 'Robot', value: 'robot' }
-        ]
-      }
-    ],
-    connectable: 'both',
-    canNest: true,
-    description: 'Change the character sprite'
-  },
-  playSound: {
-    id: 'playSound',
-    category: 'action',
-    label: 'Play Sound',
-    icon: '🔊',
-    color: '#2ecc71',
-    borderColor: '#27ae60',
-    params: [
-      {
-        name: 'sound', type: 'select', default: 'collection', options: [
-          { label: 'Collection', value: 'collection' },
-          { label: 'Success', value: 'success' },
-          { label: 'Error', value: 'error' }
-        ]
-      }
-    ],
-    connectable: 'both',
-    canNest: true,
-    description: 'Play a sound effect'
-  },
-  comment: {
-    id: 'comment',
-    category: 'action',
-    label: 'Comment',
-    icon: '💬',
-    color: '#95a5a6',
-    borderColor: '#7f8c8d',
-    params: [{ name: 'text', type: 'string', default: 'Type a comment...' }],
-    connectable: 'both',
-    canNest: true,
-    description: 'Add a comment (does not execute)'
+    description: 'Update local environment telemetry'
   }
 };

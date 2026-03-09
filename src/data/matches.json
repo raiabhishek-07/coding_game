@@ -1,53 +1,53 @@
 {
-  "zmj20sr": {
-    "id": "zmj20sr",
-    "code": "21",
-    "state": "finished",
-    "createdAt": 1772963849839,
+  "vr25p1h": {
+    "id": "vr25p1h",
+    "code": null,
+    "state": "waiting",
+    "createdAt": 1773069157412,
     "questions": [
       {
-        "id": 14,
-        "question": "If you push 1, 2, 3 onto a stack and then pop twice, what is the next popped element?",
+        "id": 6,
+        "question": "In a max-heap, where is the largest element located?",
         "options": [
-          "1",
-          "2",
-          "3",
-          "Null"
+          "Leaf node",
+          "Root node",
+          "Random node",
+          "Middle node"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "id": 13,
+        "question": "What algorithm can detect a cycle in a Linked List in O(n) time and O(1) space?",
+        "options": [
+          "Floyd's Tortoise and Hare",
+          "Dijkstra",
+          "Kadane",
+          "Bellman-Ford"
         ],
         "correctIndex": 0
       },
       {
-        "id": 1,
-        "question": "Which of the following sorting algorithms has the best average-case time complexity?",
+        "id": 5,
+        "question": "Which operation is NOT O(1) in a standard hash map without collisions?",
         "options": [
-          "Bubble Sort",
-          "Insertion Sort",
-          "Merge Sort",
-          "Selection Sort"
+          "Insertion",
+          "Lookup",
+          "Deletion",
+          "Sorting"
         ],
-        "correctIndex": 2
+        "correctIndex": 3
       },
       {
-        "id": 2,
-        "question": "What is the time complexity of searching for an element in a balanced Binary Search Tree (BST)?",
+        "id": 12,
+        "question": "What is the space complexity of a recursive Depth-First Search (DFS) on a tree of height h?",
         "options": [
           "O(1)",
+          "O(h)",
           "O(n)",
-          "O(log n)",
-          "O(n log n)"
+          "O(log h)"
         ],
-        "correctIndex": 2
-      },
-      {
-        "id": 15,
-        "question": "What is the time complexity of adding an element to the end of a dynamic array (amortized)?",
-        "options": [
-          "O(1)",
-          "O(n)",
-          "O(log n)",
-          "O(n^2)"
-        ],
-        "correctIndex": 0
+        "correctIndex": 1
       },
       {
         "id": 10,
@@ -61,13 +61,13 @@
         "correctIndex": 2
       },
       {
-        "id": 11,
-        "question": "Which data structure avoids duplicate elements by definition?",
+        "id": 4,
+        "question": "What is the worst-case time complexity of Quick Sort?",
         "options": [
-          "Array",
-          "Linked List",
-          "Set",
-          "Queue"
+          "O(n)",
+          "O(n log n)",
+          "O(n^2)",
+          "O(log n)"
         ],
         "correctIndex": 2
       },
@@ -83,15 +83,82 @@
         "correctIndex": 3
       },
       {
-        "id": 9,
-        "question": "Which dynamic programming technique uses top-down memoization?",
+        "id": 3,
+        "question": "Which data structure is typically used to implement a Breadth-First Search (BFS)?",
         "options": [
-          "Recursion with cache",
-          "Iterative table",
-          "Greedy approach",
-          "Backtracking"
+          "Stack",
+          "Queue",
+          "Tree",
+          "Graph"
         ],
-        "correctIndex": 0
+        "correctIndex": 1
+      },
+      {
+        "id": 11,
+        "question": "Which data structure avoids duplicate elements by definition?",
+        "options": [
+          "Array",
+          "Linked List",
+          "Set",
+          "Queue"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": 2,
+        "question": "What is the time complexity of searching for an element in a balanced Binary Search Tree (BST)?",
+        "options": [
+          "O(1)",
+          "O(n)",
+          "O(log n)",
+          "O(n log n)"
+        ],
+        "correctIndex": 2
+      }
+    ],
+    "player1": {
+      "score": 0,
+      "finished": false
+    }
+  },
+  "lkyeeyv": {
+    "id": "lkyeeyv",
+    "code": "2",
+    "state": "waiting",
+    "createdAt": 1773069411277,
+    "questions": [
+      {
+        "id": 1,
+        "question": "Which of the following sorting algorithms has the best average-case time complexity?",
+        "options": [
+          "Bubble Sort",
+          "Insertion Sort",
+          "Merge Sort",
+          "Selection Sort"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": 8,
+        "question": "What does a queue use to manage elements?",
+        "options": [
+          "LIFO",
+          "FIFO",
+          "FILO",
+          "Random Access"
+        ],
+        "correctIndex": 1
+      },
+      {
+        "id": 10,
+        "question": "How many pointers are typically used to reverse a linked list?",
+        "options": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "correctIndex": 2
       },
       {
         "id": 13,
@@ -105,25 +172,75 @@
         "correctIndex": 0
       },
       {
-        "id": 8,
-        "question": "What does a queue use to manage elements?",
+        "id": 2,
+        "question": "What is the time complexity of searching for an element in a balanced Binary Search Tree (BST)?",
         "options": [
-          "LIFO",
-          "FIFO",
-          "FILO",
-          "Random Access"
+          "O(1)",
+          "O(n)",
+          "O(log n)",
+          "O(n log n)"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": 3,
+        "question": "Which data structure is typically used to implement a Breadth-First Search (BFS)?",
+        "options": [
+          "Stack",
+          "Queue",
+          "Tree",
+          "Graph"
         ],
         "correctIndex": 1
+      },
+      {
+        "id": 15,
+        "question": "What is the time complexity of adding an element to the end of a dynamic array (amortized)?",
+        "options": [
+          "O(1)",
+          "O(n)",
+          "O(log n)",
+          "O(n^2)"
+        ],
+        "correctIndex": 0
+      },
+      {
+        "id": 11,
+        "question": "Which data structure avoids duplicate elements by definition?",
+        "options": [
+          "Array",
+          "Linked List",
+          "Set",
+          "Queue"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": 4,
+        "question": "What is the worst-case time complexity of Quick Sort?",
+        "options": [
+          "O(n)",
+          "O(n log n)",
+          "O(n^2)",
+          "O(log n)"
+        ],
+        "correctIndex": 2
+      },
+      {
+        "id": 9,
+        "question": "Which dynamic programming technique uses top-down memoization?",
+        "options": [
+          "Recursion with cache",
+          "Iterative table",
+          "Greedy approach",
+          "Backtracking"
+        ],
+        "correctIndex": 0
       }
     ],
     "player1": {
-      "score": 300,
-      "finished": true
-    },
-    "player2": {
-      "score": 280,
-      "finished": true
-    },
-    "startedAt": 1772963875212
+      "score": 0,
+      "finished": false
+    }
   }
 }

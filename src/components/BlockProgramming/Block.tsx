@@ -29,26 +29,19 @@ export function Block({
 }: BlockProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // Puzzle Notch SVG Component
-  const PuzzleNotch = ({ type, color }: { type: 'top' | 'bottom', color: string }) => (
-    <svg
-      width="60" height="12" viewBox="0 0 100 20"
-      style={{
-        position: 'absolute',
-        [type]: '-6px',
-        left: '16px',
-        zIndex: 10,
-        pointerEvents: 'none'
-      }}
-    >
-      <path
-        d={type === 'top'
-          ? "M 0 10 L 10 10 C 10 0, 30 0, 30 10 L 100 10"
-          : "M 0 0 L 10 0 C 10 10, 30 10, 30 0 L 100 0"
-        }
-        fill={color}
-      />
-    </svg>
+  // Subtle Connection Indicator
+  const ConnectionPoint = ({ type }: { type: 'top' | 'bottom' }) => (
+    <div style={{
+      position: 'absolute',
+      [type]: '-4px',
+      left: '24px',
+      width: '32px',
+      height: '8px',
+      background: 'rgba(0,0,0,0.4)',
+      borderRadius: '4px',
+      border: '1px solid rgba(255,255,255,0.05)',
+      zIndex: 5
+    }} />
   );
 
   return (
@@ -57,25 +50,27 @@ export function Block({
       onDragStart={(e) => onDragStart(e, block.id)}
       style={{
         position: 'relative',
-        background: `linear-gradient(135deg, ${definition.color}, ${definition.borderColor})`,
-        borderRadius: '12px',
-        padding: '10px 14px',
-        marginBottom: '6px',
+        background: `linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03))`,
+        backdropFilter: 'blur(10px)',
+        borderRadius: '14px',
+        padding: '16px',
+        marginBottom: '8px',
         cursor: isDragging ? 'grabbing' : 'grab',
-        opacity: isDragging ? 0.6 : 1,
+        opacity: isDragging ? 0.5 : 1,
         boxShadow: isDropTarget
-          ? `0 0 0 3px #f1c40f, 0 8px 16px rgba(0,0,0,0.5)`
-          : `0 4px 8px rgba(0,0,0,0.3)`,
-        transform: isDragging ? 'scale(0.95) rotate(-1deg)' : 'scale(1)',
-        transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-        marginLeft: isNested ? '24px' : '0',
-        minWidth: '200px',
-        border: '1px solid rgba(255,255,255,0.1)',
+          ? `0 0 0 2px #f1c40f, 0 10px 30px rgba(0,0,0,0.5)`
+          : `0 4px 12px rgba(0,0,0,0.2)`,
+        transform: isDragging ? 'scale(0.98) rotate(1deg)' : 'scale(1)',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        marginLeft: isNested ? '20px' : '0',
+        minWidth: '220px',
+        border: `1px solid rgba(255,255,255,0.05)`,
+        borderLeft: `4px solid ${definition.color}`,
         overflow: 'visible'
       }}
     >
-      {/* Top Notch */}
-      <PuzzleNotch type="top" color={definition.color} />
+      {/* Top Connection */}
+      <ConnectionPoint type="top" />
 
       {/* Header */}
       <div
@@ -133,13 +128,13 @@ export function Block({
             border: 'none',
             color: '#ff7675',
             borderRadius: '6px',
-            width: '20px',
-            height: '20px',
+            width: '24px',
+            height: '24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            fontSize: '10px',
+            fontSize: '12px',
             fontWeight: 'bold',
             transition: 'all 0.2s'
           }}
@@ -234,8 +229,8 @@ export function Block({
         </div>
       )}
 
-      {/* Bottom Notch */}
-      <PuzzleNotch type="bottom" color={definition.borderColor} />
+      {/* Bottom Connection */}
+      <ConnectionPoint type="bottom" />
     </div>
   );
 }

@@ -9,9 +9,10 @@ import { BLOCK_CATEGORIES, BLOCK_LIBRARY, BlockCategory } from './BlockTypes';
 interface BlockPaletteProps {
   onBlockAdd: (blockType: string) => void;
   allowedCategories?: BlockCategory[];
+  width?: number;
 }
 
-export function BlockPalette({ onBlockAdd, allowedCategories }: BlockPaletteProps) {
+export function BlockPalette({ onBlockAdd, allowedCategories, width = 320 }: BlockPaletteProps) {
   const [activeCategory, setActiveCategory] = useState<BlockCategory>('movement');
 
   const categories = (Object.entries(BLOCK_CATEGORIES) as Array<[BlockCategory, typeof BLOCK_CATEGORIES[BlockCategory]]>)
@@ -26,26 +27,27 @@ export function BlockPalette({ onBlockAdd, allowedCategories }: BlockPaletteProp
   return (
     <div
       style={{
-        width: '300px',
-        background: 'rgba(5, 5, 8, 0.98)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+        width: `${width}px`,
+        background: 'rgba(5, 5, 8, 0.4)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
         display: 'flex',
         height: '100%',
         overflow: 'hidden',
-        backdropFilter: 'blur(40px)',
-        zIndex: 5
+        backdropFilter: 'blur(10px)',
+        zIndex: 5,
+        transition: 'width 0.1s linear'
       }}
     >
       {/* Left Column: Category Selectors */}
       <div style={{
-        width: '70px',
-        background: 'rgba(0, 0, 0, 0.3)',
-        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+        width: '64px',
+        background: 'rgba(0, 0, 0, 0.2)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.03)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        paddingTop: '16px',
-        gap: '12px',
+        paddingTop: '20px',
+        gap: '16px',
         overflowY: 'auto'
       }}>
         {categories.map(([categoryKey, categoryInfo]) => {
@@ -58,37 +60,25 @@ export function BlockPalette({ onBlockAdd, allowedCategories }: BlockPaletteProp
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '10px',
+                gap: '8px',
                 cursor: 'pointer',
-                opacity: isActive ? 1 : 0.4,
-                transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                opacity: isActive ? 1 : 0.3,
+                transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                 width: '100%',
-                padding: '8px 0'
               }}
             >
               <div style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '8px',
-                background: categoryInfo.color,
-                boxShadow: isActive ? `0 0 15px ${categoryInfo.color}88` : 'none',
+                width: '32px',
+                height: '32px',
+                borderRadius: '10px',
+                background: isActive ? categoryInfo.color : 'rgba(255,255,255,0.05)',
+                boxShadow: isActive ? `0 0 20px ${categoryInfo.color}66` : 'none',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '14px',
-                border: isActive ? '1.5px solid #fff' : 'none'
+                fontSize: '16px',
+                color: isActive ? '#fff' : 'rgba(255,255,255,0.4)',
+                border: isActive ? '1px solid rgba(255,255,255,0.2)' : '1px solid transparent'
               }}>
-                {categoryKey === 'movement' ? '🚀' : categoryKey === 'action' ? '⚔️' : categoryKey === 'control' ? '🔄' : categoryKey === 'logic' ? '🧠' : '📜'}
-              </div>
-              <div style={{
-                fontSize: '8px',
-                fontWeight: 900,
-                color: isActive ? '#fff' : '#666',
-                textAlign: 'center',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                userSelect: 'none'
-              }}>
-                {categoryInfo.label}
+                {categoryInfo.icon}
               </div>
             </div>
           );
@@ -96,21 +86,32 @@ export function BlockPalette({ onBlockAdd, allowedCategories }: BlockPaletteProp
       </div>
 
       {/* Right Column: Active Category Blocks */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '16px', background: 'transparent' }}>
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '24px 16px',
+        background: 'transparent',
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <div style={{
-          fontSize: '10px',
+          fontSize: '9px',
           fontWeight: 900,
-          color: 'rgba(255,255,255,0.3)',
+          color: 'rgba(255,255,255,0.2)',
           textTransform: 'uppercase',
-          letterSpacing: '1.5px',
-          marginBottom: '16px',
+          letterSpacing: '2px',
+          marginBottom: '20px',
           display: 'flex', alignItems: 'center', gap: '8px'
         }}>
-          <div style={{ background: BLOCK_CATEGORIES[activeCategory].color, width: '8px', height: '8px', borderRadius: '2px' }} />
           {BLOCK_CATEGORIES[activeCategory].label} MODULES
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: '10px'
+        }}>
           {Object.values(BLOCK_LIBRARY)
             .filter((block) => block.category === activeCategory)
             .map((block) => (
@@ -124,40 +125,27 @@ export function BlockPalette({ onBlockAdd, allowedCategories }: BlockPaletteProp
                 }}
                 className="palette-block"
                 style={{
-                  background: `linear-gradient(135deg, ${block.color}cc, ${block.borderColor}cc)`,
-                  border: `1px solid rgba(255,255,255,0.15)`,
+                  background: 'rgba(255,255,255,0.02)',
+                  border: `1px solid rgba(255,255,255,0.05)`,
+                  borderLeft: `3px solid ${block.color}`,
                   color: '#fff',
-                  padding: '12px 14px',
-                  borderRadius: '12px',
-                  fontWeight: 800,
+                  padding: '12px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '10px',
-                  fontSize: '12px',
-                  transition: 'all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+                  fontSize: '11px',
+                  transition: 'all 0.2s',
                   position: 'relative',
-                  overflow: 'hidden'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = `0 12px 24px ${block.color}44`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.2)';
+                  overflow: 'hidden',
+                  minWidth: '140px',
+                  flex: '1 1 140px'
                 }}
               >
-                {/* Shine effect */}
-                <div style={{
-                  position: 'absolute', top: '-50%', left: '-50%', width: '200%', height: '200%',
-                  background: 'linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%)',
-                  transform: 'rotate(25deg)', pointerEvents: 'none'
-                }} />
-
-                <div style={{ flex: 1, letterSpacing: '0.5px' }}>{block.label}</div>
-                <div style={{ fontSize: '18px', opacity: 0.8 }}>+</div>
+                <span style={{ fontSize: '14px' }}>{block.icon}</span>
+                <div style={{ flex: 1, letterSpacing: '0.4px', opacity: 0.9 }}>{block.label}</div>
               </div>
             ))}
         </div>

@@ -17,6 +17,7 @@ interface BlockProgrammingEditorProps {
   levelId?: number;
   autoSave?: boolean;
   allowedCategories?: BlockCategory[];
+  sidebarWidth?: number;
 }
 
 export function BlockProgrammingEditor({
@@ -25,7 +26,8 @@ export function BlockProgrammingEditor({
   onStop,
   levelId,
   autoSave = true,
-  allowedCategories
+  allowedCategories,
+  sidebarWidth = 550
 }: BlockProgrammingEditorProps) {
   const [blocks, setBlocks] = useState<BlockInstance[]>([]);
   const [showValidation, setShowValidation] = useState(false);
@@ -179,44 +181,26 @@ export function BlockProgrammingEditor({
       }}
     >
       <div style={{
-        background: 'rgba(10, 10, 15, 0.8)',
-        borderBottom: '1px solid rgba(102, 126, 234, 0.1)',
-        padding: '8px 16px',
+        background: 'rgba(5, 5, 8, 0.4)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+        padding: '12px 20px',
         display: 'flex',
         gap: '12px',
         alignItems: 'center',
-        backdropFilter: 'blur(16px)',
         zIndex: 100
       }}>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button
-            onClick={handleUndo}
-            disabled={historyIndex <= 0}
-            className="action-pill-btn"
-          >
-            ↶ UNDO
+          <button onClick={handleUndo} disabled={historyIndex <= 0} className="action-pill-btn">
+            UNDO
           </button>
-
-          <button
-            onClick={handleRedo}
-            disabled={historyIndex >= history.length - 1}
-            className="action-pill-btn"
-          >
-            REDO ↷
+          <button onClick={handleRedo} disabled={historyIndex >= history.length - 1} className="action-pill-btn">
+            REDO
           </button>
         </div>
-
         <div style={{ flex: 1 }} />
-
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            onClick={handleClear}
-            disabled={blocks.length === 0}
-            className="action-pill-btn danger"
-          >
-            CLEAR
-          </button>
-        </div>
+        <button onClick={handleClear} disabled={blocks.length === 0} className="action-pill-btn danger">
+          WIPE CORE
+        </button>
       </div>
 
       {/* Main Content */}
@@ -226,12 +210,16 @@ export function BlockProgrammingEditor({
           flex: 1,
           overflow: 'hidden',
           background: '#0a0a0f',
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px)',
-          backgroundSize: '30px 30px'
+          backgroundImage: 'radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '32px 32px'
         }}
       >
         {/* Block Palette */}
-        <BlockPalette onBlockAdd={handleAddBlock} allowedCategories={allowedCategories} />
+        <BlockPalette
+          onBlockAdd={handleAddBlock}
+          allowedCategories={allowedCategories}
+          width={Math.max(220, sidebarWidth * 0.4)}
+        />
 
         {/* Main Workspace */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -270,27 +258,30 @@ export function BlockProgrammingEditor({
 
           {/* Statistics Footer */}
           <div style={{
-            background: 'rgba(10, 10, 15, 0.95)',
-            borderTop: '1px solid rgba(255,255,255,0.05)',
+            background: 'rgba(5, 5, 8, 0.8)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             padding: '12px 24px',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            fontSize: '11px',
-            color: 'rgba(255,255,255,0.4)',
-            fontWeight: 900,
+            fontSize: '10px',
+            color: 'rgba(255,255,255,0.3)',
+            fontWeight: 800,
             letterSpacing: '1px'
           }}>
-            <div style={{ display: 'flex', gap: '24px' }}>
-              <div>
-                MODULES: <span style={{ color: '#667eea' }}>{blocks.length}</span>
+            <div style={{ display: 'flex', gap: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ opacity: 0.5 }}>ACTIVE_MODULES:</span>
+                <span style={{ color: '#fff', fontWeight: 900 }}>{blocks.length.toString().padStart(2, '0')}</span>
               </div>
-              <div>
-                EST. RUNTIME: <span style={{ color: '#55efc4' }}>{executionTimeEstimate.toFixed(1)}S</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ opacity: 0.5 }}>COMPUTE_TIME:</span>
+                <span style={{ color: '#fff', fontWeight: 900 }}>{executionTimeEstimate.toFixed(1)}s</span>
               </div>
             </div>
-            <div style={{ opacity: 0.5 }}>
-              PERSISTENCE: {autoSave ? 'ACTIVE' : 'OFFLINE'}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', boxShadow: '0 0 10px #4ade80' }} />
+              AUTOSAVE_ACTIVE
             </div>
           </div>
         </div>

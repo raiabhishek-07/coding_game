@@ -156,9 +156,18 @@ export function BlockWorkspace({
         onDragLeave={handleDragLeave}
         onDrop={(e) => handleDrop(e, index)}
         style={{
-          position: 'relative'
+          position: 'relative',
+          padding: '2px 0'
         }}
       >
+        {/* Connection drop indicator */}
+        {dropTargetId === block.id && (
+          <div style={{
+            position: 'absolute', top: '-4px', left: '20px', right: '20px', height: '4px',
+            background: '#f1c40f', borderRadius: '2px', boxShadow: '0 0 10px #f1c40f',
+            zIndex: 10
+          }} />
+        )}
         <Block
           block={block}
           definition={definition}

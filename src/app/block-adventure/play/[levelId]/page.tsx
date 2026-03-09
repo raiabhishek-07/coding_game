@@ -23,9 +23,40 @@ export default function PlayLevelPage({ params }: { params: Promise<{ levelId: s
 
     const [blockCommands, setBlockCommands] = useState<any[]>([]);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [runTrigger, setRunTrigger] = useState(0);
     const [stopTrigger, setStopTrigger] = useState(0);
     const [gemsCollected, setGemsCollected] = useState(0);
+
+    // Sidebar Dynamic Controls
+    const [sidebarWidth, setSidebarWidth] = useState(550);
+    const [isResizing, setIsResizing] = useState(false);
+
+    const startResizing = React.useCallback((e: React.MouseEvent) => {
+        setIsResizing(true);
+    }, []);
+
+    const stopResizing = React.useCallback(() => {
+        setIsResizing(false);
+    }, []);
+
+    const resize = React.useCallback((e: MouseEvent) => {
+        if (isResizing) {
+            const newWidth = e.clientX;
+            if (newWidth > 300 && newWidth < 1000) {
+                setSidebarWidth(newWidth);
+            }
+        }
+    }, [isResizing]);
+
+    useEffect(() => {
+        window.addEventListener('mousemove', resize);
+        window.addEventListener('mouseup', stopResizing);
+        return () => {
+            window.removeEventListener('mousemove', resize);
+            window.removeEventListener('mouseup', stopResizing);
+        };
+    }, [resize, stopResizing]);
 
     const getAllowedCategories = (id: number): any[] => {
         if (id <= 7) return ['movement', 'action'];
@@ -148,19 +179,70 @@ export default function PlayLevelPage({ params }: { params: Promise<{ levelId: s
                 </div>
             </header>
 
-            {/* 2. MAIN WORKSPACE AREA */}
-            <main style={{
-                flex: 1, display: 'flex', gap: '8px', padding: '8px',
-                background: 'radial-gradient(circle at 50% 120%, #1a1a24 0%, #0a0a0f 100%)',
-                overflow: 'hidden', height: 'calc(100vh - 70px)'
+            {/* 1. LAYER: Game Engine (Full Window) */}
+            <div style={{
+                position: 'absolute', inset: 0, zIndex: 0,
+                background: 'radial-gradient(circle at 50% 50%, #1a1a24 0%, #050510 100%)'
             }}>
-                {/* Left Panel: Logic Editor */}
-                <section style={{
-                    width: '450px', background: 'rgba(10, 10, 15, 0.6)', borderRadius: '20px',
-                    border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden',
-                    display: 'flex', flexDirection: 'column', boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-                    backdropFilter: 'blur(20px)', flexShrink: 0
-                }}>
+                <PhaserEngine
+                    blocks={blockCommands}
+                    level={level}
+                    runTrigger={runTrigger}
+                    stopTrigger={stopTrigger}
+                    onFinish={onFinishSequence}
+                    onGemsUpdate={setGemsCollected}
+                />
+            </div>
+
+            {/* Mission Objective Overlay (Top Right over Game) */}
+            <div style={{
+                position: 'absolute', top: '100px', right: '32px', zIndex: 10,
+                background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)',
+                padding: '16px 24px', borderRadius: '16px', borderLeft: '4px solid #667eea',
+                pointerEvents: 'none', maxWidth: '300px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+            }}>
+                <div style={{ fontSize: '10px', color: '#667eea', fontWeight: 900, letterSpacing: '2px', marginBottom: '4px' }}>MISSION OBJECTIVE</div>
+                <div style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)', lineHeight: 1.4 }}>
+                    {level.description || 'Navigate to the crystal and collect all fragments.'}
+                </div>
+            </div>
+
+            {/* Sidebar Toggle Button */}
+            <button
+                onClick={() => { sfxClick(); setIsSidebarOpen(!isSidebarOpen); }}
+                style={{
+                    position: 'absolute', left: isSidebarOpen ? `${sidebarWidth}px` : '0px', top: '50%', transform: 'translateY(-50%)',
+                    zIndex: 20, width: '32px', height: '64px', background: 'rgba(10, 10, 15, 0.9)',
+                    border: '1px solid rgba(255,255,255,0.1)', borderLeft: 'none',
+                    borderRadius: '0 12px 12px 0', cursor: 'pointer', display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', transition: isResizing ? 'none' : 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                    backdropFilter: 'blur(10px)', boxShadow: '10px 0 20px rgba(0,0,0,0.3)'
+                }}
+            >
+                <span style={{ fontSize: '14px', color: '#fff', opacity: 0.8 }}>{isSidebarOpen ? '◀' : '▶'}</span>
+            </button>
+
+            {/* Left Sidebar: Logic Editor */}
+            <aside style={{
+                position: 'absolute', top: '70px', bottom: '0', left: 0,
+                width: `${sidebarWidth}px`, background: 'rgba(10, 10, 15, 0.85)',
+                borderRight: '1px solid rgba(255,255,255,0.05)', zIndex: 15,
+                transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+                transition: isResizing ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                boxShadow: isSidebarOpen ? '20px 0 50px rgba(0,0,0,0.5)' : 'none',
+                backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column'
+            }}>
+                {/* Resize Handle */}
+                <div
+                    onMouseDown={startResizing}
+                    style={{
+                        position: 'absolute', right: '-4px', top: 0, bottom: 0, width: '8px',
+                        cursor: 'col-resize', zIndex: 100, background: isResizing ? 'rgba(102, 126, 234, 0.3)' : 'transparent',
+                        transition: 'background 0.2s'
+                    }}
+                />
+                <div style={{ flex: 1, overflow: 'hidden' }}>
                     <BlockProgrammingEditor
                         onExecute={onExecuteBlocks}
                         isExecuting={isPlaying}
@@ -168,71 +250,33 @@ export default function PlayLevelPage({ params }: { params: Promise<{ levelId: s
                         levelId={level.id}
                         allowedCategories={getAllowedCategories(level.id)}
                         autoSave={true}
+                        sidebarWidth={sidebarWidth}
                     />
-                </section>
+                </div>
 
-                {/* Right Panel: Game Execution */}
-                <section style={{
-                    flex: 1, position: 'relative', display: 'flex', flexDirection: 'column',
-                    gap: '16px', minWidth: 0
+                {/* Console / Status HUD */}
+                <div style={{
+                    padding: '24px', background: 'rgba(0,0,0,0.3)',
+                    borderTop: '1px solid rgba(255,255,255,0.05)',
+                    display: 'flex', alignItems: 'center', gap: '16px'
                 }}>
-                    <div className="game-window-container" style={{
-                        flex: 1, background: '#000', borderRadius: '32px', overflow: 'hidden',
-                        border: '8px solid rgba(255,255,255,0.03)', boxShadow: '0 40px 100px rgba(0,0,0,0.8)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        position: 'relative'
-                    }}>
-                        {/* Decorative Corner Borders */}
-                        <div className="terminal-corner tl"></div>
-                        <div className="terminal-corner tr"></div>
-                        <div className="terminal-corner bl"></div>
-                        <div className="terminal-corner br"></div>
-                        <PhaserEngine
-                            blocks={blockCommands}
-                            level={level}
-                            runTrigger={runTrigger}
-                            stopTrigger={stopTrigger}
-                            onFinish={onFinishSequence}
-                            onGemsUpdate={setGemsCollected}
-                        />
-
-                        {/* Mission Objective Overlay */}
-                        <div style={{
-                            position: 'absolute', top: '24px', left: '24px',
-                            background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)',
-                            padding: '12px 20px', borderRadius: '12px', borderLeft: '4px solid #667eea',
-                            pointerEvents: 'none'
-                        }}>
-                            <div style={{ fontSize: '10px', color: '#667eea', fontWeight: 900, letterSpacing: '2px' }}>MISSION</div>
-                            <div style={{ fontSize: '13px', fontWeight: 600 }}>{level.description || 'Navigate to the crystal and collect all fragments.'}</div>
-                        </div>
-                    </div>
-
-                    {/* Console / Status HUD */}
                     <div style={{
-                        height: '70px', background: 'rgba(255,255,255,0.02)',
-                        borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)',
-                        display: 'flex', alignItems: 'center', padding: '0 24px', gap: '16px',
-                        flexShrink: 0
+                        width: '32px', height: '32px', borderRadius: '8px',
+                        background: isPlaying ? '#f19066' : '#55efc4',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '16px', boxShadow: isPlaying ? '0 0 20px #f1906644' : '0 0 20px #55efc444',
+                        animation: isPlaying ? 'pulse-btn 1.5s infinite' : 'none'
                     }}>
-                        <div style={{
-                            width: '32px', height: '32px', borderRadius: '8px',
-                            background: isPlaying ? '#f19066' : '#55efc4',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            fontSize: '16px', boxShadow: isPlaying ? '0 0 20px #f1906644' : '0 0 20px #55efc444',
-                            animation: isPlaying ? 'pulse-btn 1.5s infinite' : 'none'
-                        }}>
-                            {isPlaying ? '⚡' : '📡'}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', fontWeight: 900, letterSpacing: '1px' }}>SYSTEM_CORE_STATUS</div>
-                            <div style={{ fontSize: '14px', fontWeight: 700, color: isPlaying ? '#f19066' : '#55efc4', letterSpacing: '0.5px' }}>
-                                {isPlaying ? 'EXECUTING COMMANDS...' : 'SYSTEM READY'}
-                            </div>
+                        {isPlaying ? '⚡' : '📡'}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.4)', fontWeight: 900, letterSpacing: '1px' }}>SYSTEM_CORE_STATUS</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: isPlaying ? '#f19066' : '#55efc4', letterSpacing: '0.5px' }}>
+                            {isPlaying ? 'EXECUTING COMMANDS...' : 'SYSTEM READY'}
                         </div>
                     </div>
-                </section>
-            </main>
+                </div>
+            </aside>
 
             <style dangerouslySetInnerHTML={{
                 __html: `
