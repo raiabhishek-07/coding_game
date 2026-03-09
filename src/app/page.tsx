@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ALL_LEVELS } from '@/lib/levels/index';
 import { useGameStore } from '@/store/gameStore';
+import { sfxClick, sfxHover, sfxLocked } from '@/lib/sounds';
 
 const WORLD_META = [
   { id: 1, name: 'The Awakening Forest', icon: '🌲', theme: 'forest', color: '#00d4aa', firstLevel: '1-1' },
@@ -74,7 +75,37 @@ export default function HomePage() {
             display: 'flex', gap: '16px'
           }}>
             <button
-              onClick={() => router.push('/algo-quest')}
+              onClick={() => {
+                sfxClick();
+                router.push('/multiplayer');
+              }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(255,80,0,0.1), rgba(255,40,0,0.05))',
+                border: '1px solid rgba(255,80,0,0.2)',
+                borderRadius: '24px', padding: '8px 16px',
+                color: '#e8e8ff', fontSize: '13px', fontWeight: 600,
+                cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', gap: '8px',
+                boxShadow: '0 0 10px rgba(255,80,0,0.1)',
+              }}
+              onMouseEnter={(e) => {
+                sfxHover();
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,80,0,0.2), rgba(255,40,0,0.1))';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(255,80,0,0.1), rgba(255,40,0,0.05))';
+              }}
+            >
+              <span style={{ fontSize: '16px' }}>⚔️</span> Multiplayer Duel
+            </button>
+
+            <button
+              onClick={() => {
+                sfxClick();
+                router.push('/algo-quest');
+              }}
               style={{
                 background: 'linear-gradient(135deg, rgba(0,200,255,0.1), rgba(0,100,255,0.05))',
                 border: '1px solid rgba(0,200,255,0.2)',
@@ -84,11 +115,12 @@ export default function HomePage() {
                 display: 'flex', alignItems: 'center', gap: '8px',
                 boxShadow: '0 0 10px rgba(0,200,255,0.1)',
               }}
-              onMouseOver={(e) => {
+              onMouseEnter={(e) => {
+                sfxHover();
                 e.currentTarget.style.transform = 'translateY(-2px)';
                 e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,200,255,0.2), rgba(0,100,255,0.1))';
               }}
-              onMouseOut={(e) => {
+              onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
                 e.currentTarget.style.background = 'linear-gradient(135deg, rgba(0,200,255,0.1), rgba(0,100,255,0.05))';
               }}
@@ -97,7 +129,10 @@ export default function HomePage() {
             </button>
 
             <button
-              onClick={() => router.push('/trophies')}
+              onClick={() => {
+                sfxClick();
+                router.push('/trophies');
+              }}
               style={{
                 background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.25)',
                 borderRadius: '10px', padding: '8px 16px',
@@ -106,7 +141,10 @@ export default function HomePage() {
                 display: 'flex', alignItems: 'center', gap: '6px',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.18)'; }}
+              onMouseEnter={e => {
+                sfxHover();
+                e.currentTarget.style.background = 'rgba(255,215,0,0.18)';
+              }}
               onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.08)'; }}
             >
               🏆 Trophies
@@ -213,8 +251,18 @@ export default function HomePage() {
                       <div
                         key={level.id}
                         id={`level-${level.id}`}
-                        onClick={() => unlocked && router.push(`/game/${level.id}`)}
-                        onMouseEnter={() => setHoveredLevel(level.id)}
+                        onClick={() => {
+                          if (unlocked) {
+                            sfxClick();
+                            router.push(`/game/${level.id}`);
+                          } else {
+                            sfxLocked();
+                          }
+                        }}
+                        onMouseEnter={() => {
+                          if (unlocked) sfxHover();
+                          setHoveredLevel(level.id);
+                        }}
                         onMouseLeave={() => setHoveredLevel(null)}
                         style={{
                           width: '160px',
@@ -280,6 +328,7 @@ export default function HomePage() {
           <button
             id="start-quest-btn"
             onClick={() => {
+              sfxClick();
               // Find the first incomplete level that's unlocked
               const next = ALL_LEVELS.find(l => !levelProgress[l.id]?.completed && isLevelUnlocked(l.id));
               router.push(`/game/${next?.id || '1-1'}`);
@@ -292,7 +341,10 @@ export default function HomePage() {
               fontFamily: 'Inter', boxShadow: '0 4px 20px rgba(79,143,255,0.3)',
               transition: 'all 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+            onMouseEnter={e => {
+              sfxHover();
+              e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; }}
           >
             {totalCompleted > 0 ? '▶ Continue Quest' : '⚔️ Start Your Quest'}

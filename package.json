@@ -16,6 +16,8 @@
     "phaser": "^3.90.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "zustand": "^5.0.11"
   },
   "devDependencies": {

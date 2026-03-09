@@ -12,6 +12,7 @@ import ByteCompanion from '@/components/Companion/ByteCompanion';
 import LevelCompleteModal from '@/components/LevelComplete/LevelCompleteModal';
 import StreakCelebration from '@/components/StreakCelebration/StreakCelebration';
 import AIChat from '@/components/AIChat/AIChat';
+import LevelBriefingModal from '@/components/LevelBriefing/LevelBriefingModal';
 
 const WORLD_THEMES: Record<string, { bg: string; accent: string; icon: string }> = {
     forest: { bg: 'linear-gradient(135deg, #0d1f0d, #1a3a1a)', accent: '#00d4aa', icon: '🌲' },
@@ -31,6 +32,7 @@ export default function GamePage() {
     const [lastStars, setLastStars] = useState(0);
     const [flashSuccess, setFlashSuccess] = useState(false);
     const [flashDefeat, setFlashDefeat] = useState(false);
+    const [showBriefing, setShowBriefing] = useState(true);
 
     const levelId = params?.level as string;
     const level = ALL_LEVELS.find(l => l.id === levelId) || ALL_LEVELS[0];
@@ -43,6 +45,7 @@ export default function GamePage() {
         setLevel(level.world, level.level);
         updateStreak();
         setShowModal(false);
+        setShowBriefing(true);
         setLastStars(0);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [levelId]);
@@ -145,6 +148,7 @@ export default function GamePage() {
                         onNextLevel={handleNextLevel}
                         timeLimit={timeLimit}
                         onDefeated={handleDefeated}
+                        isPaused={showBriefing}
                     />
                     <ByteCompanion />
                 </div>
@@ -175,7 +179,19 @@ export default function GamePage() {
                 levelId={level.id}
                 levelTitle={level.title}
                 levelDescription={level.objective}
+                levelConcept={level.concept}
+                levelHints={level.hints}
             />
+
+            {/* Level Briefing Modal - Displays on level entry */}
+            {showBriefing && (
+                <LevelBriefingModal
+                    level={level}
+                    theme={theme}
+                    onReady={() => setShowBriefing(false)}
+                    onExit={() => router.push('/')}
+                />
+            )}
         </div>
     );
 }

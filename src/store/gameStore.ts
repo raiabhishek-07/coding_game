@@ -37,6 +37,7 @@ interface GameState {
     // Game screen
     gamePhase: 'idle' | 'running' | 'success' | 'retry';
     warriorAction: string | null;
+    language: string;
 
     // Hints
     hintsUsed: number;
@@ -50,6 +51,7 @@ interface GameState {
     clearConsole: () => void;
     setGamePhase: (phase: GameState['gamePhase']) => void;
     setWarriorAction: (action: string | null) => void;
+    setLanguage: (lang: string) => void;
     toggleHint: () => void;
     nextHint: () => void;
     setLevel: (world: number, level: number) => void;
@@ -110,6 +112,7 @@ export const useGameStore = create<GameState>((set, get) => {
         // --- Game ---
         gamePhase: 'idle',
         warriorAction: null,
+        language: 'javascript',
 
         // --- Hints ---
         hintsUsed: 0,
@@ -137,6 +140,8 @@ export const useGameStore = create<GameState>((set, get) => {
         setGamePhase: (phase) => set({ gamePhase: phase }),
 
         setWarriorAction: (action) => set({ warriorAction: action }),
+
+        setLanguage: (language) => set({ language }),
 
         toggleHint: () => set((state) => ({
             showHint: !state.showHint,

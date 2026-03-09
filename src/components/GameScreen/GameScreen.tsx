@@ -9,6 +9,7 @@ interface GameScreenProps {
     onNextLevel?: () => void;
     timeLimit?: number; // seconds — default 300 (5 min)
     onDefeated?: () => void;
+    isPaused?: boolean;
 }
 
 const WORLD_SCENES: Record<string, {
@@ -86,7 +87,7 @@ interface Projectile {
     emoji: string;
 }
 
-export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit = 300, onDefeated }: GameScreenProps) {
+export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit = 300, onDefeated, isPaused = false }: GameScreenProps) {
     const { gamePhase, warriorAction } = useGameStore();
     const [warriorState, setWarriorState] = useState<WarriorState>('idle');
     const [warriorX, setWarriorX] = useState(15);
@@ -154,9 +155,10 @@ export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit =
         setEnemyHealth(100);
         setEnemyVisible(true);
 
-        // Start ticking right away — always, regardless of gamePhase
+        // Start ticking right away — always, regardless of gamePhase, unless paused
         if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = setInterval(() => {
+            if (isPaused) return;
             setTimeLeft(prev => {
                 if (prev <= 1) {
                     clearInterval(timerRef.current!);
@@ -188,7 +190,7 @@ export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit =
     // ── ALWAYS-ON enemy fire: fires from mount until success/defeat ──────────
     useEffect(() => {
         if (enemyFireRef.current) clearInterval(enemyFireRef.current);
-        if (defeated || gamePhase === 'success') return;
+        if (defeated || gamePhase === 'success' || isPaused) return;
 
         // Enemy fires faster when player is running (battle heats up)
         const fireDelay = gamePhase === 'running' ? 1000 : 1800;
@@ -198,11 +200,11 @@ export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit =
 
         return () => { if (enemyFireRef.current) clearInterval(enemyFireRef.current); };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [gamePhase, defeated, fireEnemyProjectile]);
+    }, [gamePhase, defeated, isPaused, fireEnemyProjectile]);
 
     // ── ALWAYS-ON warrior fire: fires from mount until success/defeat ─────────
     useEffect(() => {
-        if (defeated || gamePhase === 'success') return;
+        if (defeated || gamePhase === 'success' || isPaused) return;
 
         // Warrior fires slower in idle (defending), faster when actively running
         const fireDelay = gamePhase === 'running' ? 850 : 2200;
@@ -213,10 +215,10 @@ export default function GameScreen({ worldTheme, theme, onNextLevel, timeLimit =
                 setEnemyHealth(prev => Math.max(15, prev - 2));
             }
         }, fireDelay);
+
         return () => clearInterval(warriorFire);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [gamePhase, defeated, fireWarriorProjectile]);
-
+    }, [gamePhase, defeated, isPaused, fireWarriorProjectile]);
     // ── Phase reactions ───────────────────────────────────────────────────────
     useEffect(() => {
         if (gamePhase === 'running') {

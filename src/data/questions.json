@@ -1,0 +1,167 @@
+[
+    {
+        "id": 1,
+        "question": "Which of the following sorting algorithms has the best average-case time complexity?",
+        "options": [
+            "Bubble Sort",
+            "Insertion Sort",
+            "Merge Sort",
+            "Selection Sort"
+        ],
+        "correctIndex": 2
+    },
+    {
+        "id": 2,
+        "question": "What is the time complexity of searching for an element in a balanced Binary Search Tree (BST)?",
+        "options": [
+            "O(1)",
+            "O(n)",
+            "O(log n)",
+            "O(n log n)"
+        ],
+        "correctIndex": 2
+    },
+    {
+        "id": 3,
+        "question": "Which data structure is typically used to implement a Breadth-First Search (BFS)?",
+        "options": [
+            "Stack",
+            "Queue",
+            "Tree",
+            "Graph"
+        ],
+        "correctIndex": 1
+    },
+    {
+        "id": 4,
+        "question": "What is the worst-case time complexity of Quick Sort?",
+        "options": [
+            "O(n)",
+            "O(n log n)",
+            "O(n^2)",
+            "O(log n)"
+        ],
+        "correctIndex": 2
+    },
+    {
+        "id": 5,
+        "question": "Which operation is NOT O(1) in a standard hash map without collisions?",
+        "options": [
+            "Insertion",
+            "Lookup",
+            "Deletion",
+            "Sorting"
+        ],
+        "correctIndex": 3
+    },
+    {
+        "id": 6,
+        "question": "In a max-heap, where is the largest element located?",
+        "options": [
+            "Leaf node",
+            "Root node",
+            "Random node",
+            "Middle node"
+        ],
+        "correctIndex": 1
+    },
+    {
+        "id": 7,
+        "question": "Which of the following finds the shortest path in a weighted graph with non-negative edges?",
+        "options": [
+            "DFS",
+            "BFS",
+            "Kruskal's Algorithm",
+            "Dijkstra's Algorithm"
+        ],
+        "correctIndex": 3
+    },
+    {
+        "id": 8,
+        "question": "What does a queue use to manage elements?",
+        "options": [
+            "LIFO",
+            "FIFO",
+            "FILO",
+            "Random Access"
+        ],
+        "correctIndex": 1
+    },
+    {
+        "id": 9,
+        "question": "Which dynamic programming technique uses top-down memoization?",
+        "options": [
+            "Recursion with cache",
+            "Iterative table",
+            "Greedy approach",
+            "Backtracking"
+        ],
+        "correctIndex": 0
+    },
+    {
+        "id": 10,
+        "question": "How many pointers are typically used to reverse a linked list?",
+        "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+        ],
+        "correctIndex": 2
+    },
+    {
+        "id": 11,
+        "question": "Which data structure avoids duplicate elements by definition?",
+        "options": [
+            "Array",
+            "Linked List",
+            "Set",
+            "Queue"
+        ],
+        "correctIndex": 2
+    },
+    {
+        "id": 12,
+        "question": "What is the space complexity of a recursive Depth-First Search (DFS) on a tree of height h?",
+        "options": [
+            "O(1)",
+            "O(h)",
+            "O(n)",
+            "O(log h)"
+        ],
+        "correctIndex": 1
+    },
+    {
+        "id": 13,
+        "question": "What algorithm can detect a cycle in a Linked List in O(n) time and O(1) space?",
+        "options": [
+            "Floyd's Tortoise and Hare",
+            "Dijkstra",
+            "Kadane",
+            "Bellman-Ford"
+        ],
+        "correctIndex": 0
+    },
+    {
+        "id": 14,
+        "question": "If you push 1, 2, 3 onto a stack and then pop twice, what is the next popped element?",
+        "options": [
+            "1",
+            "2",
+            "3",
+            "Null"
+        ],
+        "correctIndex": 0
+    },
+    {
+        "id": 15,
+        "question": "What is the time complexity of adding an element to the end of a dynamic array (amortized)?",
+        "options": [
+            "O(1)",
+            "O(n)",
+            "O(log n)",
+            "O(n^2)"
+        ],
+        "correctIndex": 0
+    }
+]

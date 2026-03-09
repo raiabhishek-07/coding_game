@@ -19,7 +19,82 @@ function withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promi
   ]);
 }
 
-export function runCode(userCode: string): Promise<RunResult> {
+const WANDBOX_COMPILERS: Record<string, string> = {
+  python: 'cpython-3.13.8',
+  cpp: 'gcc-13.2.0',
+  c: 'gcc-13.2.0-c',
+  java: 'openjdk-jdk-22+36'
+};
+
+async function runViaBackend(code: string, lang: string): Promise<RunResult> {
+  const compiler = WANDBOX_COMPILERS[lang];
+  if (!compiler) return { logs: ['[ERROR] Unsupported language'], error: null };
+
+  let fullCode = code;
+
+  // Inject lightweight game polyfills for Python so early levels work natively
+  if (lang === 'python') {
+    fullCode = `
+class _Warrior:
+    def __init__(self):
+        self.health = 100
+        self.attack = 75
+        self.name = "Kael"
+    def walk(self, dir, steps):
+        print(f"🚶 Walking {dir} x{steps}")
+warrior = _Warrior()
+def move(d, s): print(f"🏃 Warrior moved {d} by {s} steps")
+def collect(item): print(f"💎 Collected: {', '.join(item) if isinstance(item, list) else item}")
+def fight(enemy): print(f"⚔️ Fighting {enemy}!")
+def strike(): print("⚔️ STRIKE! Hit the enemy!")
+` + code;
+  }
+
+  try {
+    const res = await fetch("https://wandbox.org/api/compile.json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        compiler: compiler,
+        code: fullCode,
+      })
+    });
+    const data = await res.json();
+
+    if (data.message) {
+      return { logs: ['[ERROR] ' + data.message], error: data.message };
+    }
+
+    let logs: string[] = [];
+    if (data.program_output) {
+      logs = data.program_output.split('\n').filter(Boolean).map((s: string) => s.trim());
+    }
+    let error = null;
+    if (data.program_error || data.compiler_error) {
+      const errStr = data.program_error || data.compiler_error;
+      const errLines = errStr.split('\n').filter(Boolean);
+      errLines.forEach((l: string) => logs.push('[ERROR] ' + l.trim()));
+      error = errStr;
+    }
+
+    return { logs, error };
+
+  } catch (e) {
+    return {
+      logs: [
+        '[ERROR] Multi-language Execution Engine not found!',
+        '[INFO] Could not connect to the cloud compiler API.'
+      ],
+      error: 'Execution Engine Offline'
+    };
+  }
+}
+
+export function runCode(userCode: string, language: string = 'javascript'): Promise<RunResult> {
+  if (language !== 'javascript') {
+    return runViaBackend(userCode, language);
+  }
+
   const execution = new Promise<RunResult>((resolve) => {
     try {
       const __logs: string[] = [];

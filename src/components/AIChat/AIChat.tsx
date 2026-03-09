@@ -1,13 +1,17 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 
+import { useGameStore } from '@/store/gameStore';
+
 interface AIChatProps {
     levelId: string;
     levelTitle: string;
     levelDescription: string;
+    levelConcept?: string;
+    levelHints?: string[];
 }
 
-export default function AIChat({ levelId, levelTitle, levelDescription }: AIChatProps) {
+export default function AIChat({ levelId, levelTitle, levelDescription, levelConcept, levelHints }: AIChatProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant', content: string }[]>([]);
     const [input, setInput] = useState('');
@@ -16,6 +20,7 @@ export default function AIChat({ levelId, levelTitle, levelDescription }: AIChat
     const [autoSpeak, setAutoSpeak] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const recognitionRef = useRef<any>(null);
+    const { language } = useGameStore();
 
     // Auto-scroll on new message
     useEffect(() => {
@@ -87,6 +92,17 @@ export default function AIChat({ levelId, levelTitle, levelDescription }: AIChat
         setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
         setIsLoading(true);
 
+        const buildContext = () => {
+            let ctx = `Game Context - The user is playing CodeQuest.\n`;
+            ctx += `Level ID: ${levelId} - ${levelTitle}.\n`;
+            if (levelConcept) ctx += `Learning Concept: ${levelConcept}\n`;
+            ctx += `Objective/Win Condition: ${levelDescription}\n`;
+            if (levelHints && levelHints.length > 0) ctx += `Official Level Hints (for your reference): ${levelHints.join(' | ')}\n`;
+            ctx += `User's Current Language: ${language.toUpperCase()}.\n`;
+            ctx += `\nCRITICAL INSTRUCTION: Analyze the user's issue and explain the programming concepts. ALWAYS answer and write any code snippets specifically in ${language.toUpperCase()}. Help them beat exactly this objective.`;
+            return ctx;
+        };
+
         try {
             const res = await fetch('/api/chat', {
                 method: 'POST',
@@ -94,19 +110,48 @@ export default function AIChat({ levelId, levelTitle, levelDescription }: AIChat
                 body: JSON.stringify({
                     message: userMsg,
                     history: messages,
-                    context: `Level ID: ${levelId} - ${levelTitle}. Objective: ${levelDescription}`
+                    context: buildContext()
                 })
             });
 
-            const data = await res.json();
-            if (res.ok && data.reply) {
-                setMessages(prev => [...prev, { role: 'assistant', content: data.reply }]);
-                if (autoSpeak) speak(data.reply);
-            } else {
-                setMessages(prev => [...prev, { role: 'assistant', content: `❌ Error: ${data.error || 'Connection failed.'}` }]);
+            if (!res.ok) {
+                const data = await res.json();
+                throw new Error(data.error || 'Connection failed.');
             }
-        } catch (err) {
-            setMessages(prev => [...prev, { role: 'assistant', content: '❌ Connection error. Ensure Ollama is running on localhost:11434 with qwen2.5-coder:3b' }]);
+
+            // Create a placeholder for the assistant message
+            setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+            const reader = res.body?.getReader();
+            const decoder = new TextDecoder();
+            let accumulatedReply = '';
+
+            if (reader) {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    accumulatedReply += chunk;
+
+                    setMessages(prev => {
+                        const next = [...prev];
+                        if (next.length > 0) {
+                            next[next.length - 1] = {
+                                ...next[next.length - 1],
+                                content: accumulatedReply
+                            };
+                        }
+                        return next;
+                    });
+                }
+                if (autoSpeak) speak(accumulatedReply);
+            }
+        } catch (err: any) {
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: `❌ ${err.message || 'Connection error. Ensure Ollama is running on localhost:11434 with qwen2.5-coder:3b'}`
+            }]);
         } finally {
             setIsLoading(false);
         }

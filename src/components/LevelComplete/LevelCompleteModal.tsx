@@ -1,6 +1,5 @@
-'use client';
 import React, { useEffect, useState } from 'react';
-import { sfxLevelComplete, sfxStars } from '@/lib/sounds';
+import { sfxLevelComplete, sfxStars, sfxClick, sfxHover } from '@/lib/sounds';
 
 interface LevelCompleteModalProps {
     visible: boolean;
@@ -117,7 +116,7 @@ export default function LevelCompleteModal({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <button
                         id="next-level-btn"
-                        onClick={onNext}
+                        onClick={() => { sfxClick(); onNext(); }}
                         style={{
                             background: `linear-gradient(135deg, ${accentColor}, ${accentColor}aa)`,
                             border: 'none', borderRadius: '10px',
@@ -127,14 +126,15 @@ export default function LevelCompleteModal({
                             boxShadow: `0 4px 20px ${accentColor}44`,
                             transition: 'transform 0.2s',
                         }}
-                        onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                        onMouseEnter={e => { sfxHover(); e.currentTarget.style.transform = 'translateY(-2px)'; }}
                         onMouseLeave={e => { e.currentTarget.style.transform = 'none'; }}
                     >
                         Next Level →
                     </button>
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <button
-                            onClick={onReplay}
+                            onClick={() => { sfxClick(); onReplay(); }}
+                            onMouseEnter={sfxHover}
                             style={{
                                 flex: 1, background: 'rgba(255,255,255,0.05)',
                                 border: '1px solid rgba(255,255,255,0.1)',
@@ -145,7 +145,8 @@ export default function LevelCompleteModal({
                             🔄 Replay
                         </button>
                         <button
-                            onClick={onHome}
+                            onClick={() => { sfxClick(); onHome(); }}
+                            onMouseEnter={sfxHover}
                             style={{
                                 flex: 1, background: 'rgba(255,255,255,0.05)',
                                 border: '1px solid rgba(255,255,255,0.1)',

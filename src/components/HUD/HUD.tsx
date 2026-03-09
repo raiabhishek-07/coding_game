@@ -1,6 +1,6 @@
-'use client';
 import React, { useState, useEffect } from 'react';
 import { useGameStore } from '@/store/gameStore';
+import { GameAudio, sfxHover, sfxClick } from '@/lib/sounds';
 
 const WORLD_THEMES: Record<string, { bg: string; accent: string; icon: string }> = {
     forest: { bg: 'linear-gradient(135deg, #0d1f0d 0%, #1a3a1a 50%, #0d1f0d 100%)', accent: '#00d4aa', icon: '🌲' },
@@ -31,7 +31,10 @@ export default function HUD({ worldTheme = 'forest', levelTitle = '', levelConce
     useEffect(() => {
         setMounted(true);
         const saved = localStorage.getItem('codequest-muted');
-        if (saved === 'true') setMuted(true);
+        const isMuted = saved === 'true';
+        setMuted(isMuted);
+        GameAudio.isMuted = isMuted;
+        if (!isMuted) GameAudio.startBGM();
     }, []);
 
     // Use safe fallbacks before mount so SSR HTML matches initial client render
@@ -48,10 +51,9 @@ export default function HUD({ worldTheme = 'forest', levelTitle = '', levelConce
     const hearts = Math.ceil((safeHealth / maxHealth) * 5);
 
     const toggleMute = () => {
-        const next = !muted;
+        const next = GameAudio.toggleMute();
         setMuted(next);
         localStorage.setItem('codequest-muted', String(next));
-        (window as Window & { __cq_muted?: boolean }).__cq_muted = next;
     };
 
     return (
@@ -147,7 +149,11 @@ export default function HUD({ worldTheme = 'forest', levelTitle = '', levelConce
             {/* Sound toggle */}
             <button
                 id="mute-btn"
-                onClick={toggleMute}
+                onClick={() => {
+                    sfxClick();
+                    toggleMute();
+                }}
+                onMouseEnter={sfxHover}
                 title={muted ? 'Unmute sounds' : 'Mute sounds'}
                 style={{
                     background: muted ? 'rgba(255,71,87,0.1)' : 'rgba(255,255,255,0.05)',
@@ -163,15 +169,21 @@ export default function HUD({ worldTheme = 'forest', levelTitle = '', levelConce
             {onTrophies && (
                 <button
                     id="trophy-btn"
-                    onClick={onTrophies}
+                    onClick={() => {
+                        sfxClick();
+                        onTrophies();
+                    }}
+                    onMouseEnter={e => {
+                        sfxHover();
+                        e.currentTarget.style.background = 'rgba(255,215,0,0.18)';
+                    }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.08)'; }}
                     title="Trophy Room"
                     style={{
                         background: 'rgba(255,215,0,0.08)', border: '1px solid rgba(255,215,0,0.2)',
                         borderRadius: '8px', padding: '4px 10px', cursor: 'pointer',
                         fontSize: '14px', transition: 'all 0.2s',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.18)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,215,0,0.08)'; }}
                 >
                     🏆
                 </button>
